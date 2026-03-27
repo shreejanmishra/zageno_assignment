@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useProducts } from "../hooks/useProducts";
+import { useDebounce } from "../hooks/useDebounce";
 import ProductCard from "../components/ProductCard";
+import ProductCardSkeleton from "../components/ProductCardSkeleton";
 import SearchBar from "../components/SearchBar";
-import Loader from "../components/Loader";
 
 function ProductListPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
 
-  const { data: products, isLoading, error } = useProducts({ search, category });
+  const debouncedSearch = useDebounce(search, 300);
+
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useProducts({ search: debouncedSearch, category });
 
   return (
     <div>
@@ -28,7 +35,13 @@ function ProductListPage() {
         />
       </div>
 
-      {isLoading && <Loader />}
+      {isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {error && (
         <div className="text-center py-12">

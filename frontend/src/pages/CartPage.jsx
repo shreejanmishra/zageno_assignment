@@ -1,6 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
 import useCartStore from "../store/cartStore";
 import { useCreateOrder } from "../hooks/useOrders";
+import { formatPrice } from "../utils/formatPrice";
 import CartItem from "../components/CartItem";
 
 function CartPage() {
@@ -26,6 +27,12 @@ function CartPage() {
       onSuccess: () => {
         clearCart();
         navigate("/orders");
+      },
+      onError: (err) => {
+        alert(
+          err?.response?.data?.message ||
+            "Failed to place order. Please try again."
+        );
       },
     });
   };
@@ -75,7 +82,7 @@ function CartPage() {
                     {item.name} × {item.quantity}
                   </span>
                   <span className="text-gray-900 font-medium flex-shrink-0">
-                    ₹{(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -85,7 +92,7 @@ function CartPage() {
               <div className="flex justify-between">
                 <span className="text-base font-bold text-gray-900">Total</span>
                 <span className="text-xl font-bold text-gray-900">
-                  ₹{getCartTotal().toFixed(2)}
+                  {formatPrice(getCartTotal())}
                 </span>
               </div>
             </div>

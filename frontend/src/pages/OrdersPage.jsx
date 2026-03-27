@@ -1,12 +1,24 @@
 import { Link } from "react-router-dom";
 import { useOrders } from "../hooks/useOrders";
 import OrderCard from "../components/OrderCard";
-import Loader from "../components/Loader";
+import OrderCardSkeleton from "../components/OrderCardSkeleton";
 
 function OrdersPage() {
   const { data: orders, isLoading, error } = useOrders();
 
-  if (isLoading) return <Loader />;
+  if (isLoading) {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
+        <p className="text-gray-600 mb-8">Loading your orders...</p>
+        <div className="space-y-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <OrderCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (

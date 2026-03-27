@@ -1,5 +1,7 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import useCartStore from "../store/cartStore";
+import { formatPrice } from "../utils/formatPrice";
 
 function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -21,6 +23,9 @@ function ProductCard({ product }) {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          width={400}
+          height={400}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
       </div>
@@ -38,7 +43,7 @@ function ProductCard({ product }) {
 
         <div className="mt-4 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900">
-            ₹{product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </span>
           <button
             onClick={handleAddToCart}
@@ -63,4 +68,4 @@ function ProductCard({ product }) {
   );
 }
 
-export default ProductCard;
+export default memo(ProductCard);

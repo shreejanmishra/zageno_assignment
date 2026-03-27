@@ -3,7 +3,9 @@ import useCartStore from "../store/cartStore";
 
 function Navbar() {
   const location = useLocation();
-  const cartCount = useCartStore((state) => state.getCartCount());
+  const cartCount = useCartStore((state) =>
+    state.items.reduce((count, item) => count + item.quantity, 0)
+  );
 
   const navLinks = [
     { to: "/", label: "Products" },
@@ -19,7 +21,7 @@ function Navbar() {
             to="/"
             className="text-xl font-bold text-gray-900 tracking-tight"
           >
-            🛒 Whamazon
+            Whamazon
           </Link>
 
           <div className="flex items-center gap-1">

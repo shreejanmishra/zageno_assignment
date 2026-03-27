@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useProduct } from "../hooks/useProducts";
 import useCartStore from "../store/cartStore";
+import { formatPrice } from "../utils/formatPrice";
 import QuantitySelector from "../components/QuantitySelector";
 import Loader from "../components/Loader";
 
@@ -12,10 +13,15 @@ function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  useEffect(() => {
+    if (!added) return;
+    const timer = setTimeout(() => setAdded(false), 2000);
+    return () => clearTimeout(timer);
+  }, [added]);
+
   const handleAddToCart = () => {
     addToCart(product, quantity);
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
   };
 
   if (isLoading) return <Loader />;
@@ -54,6 +60,8 @@ function ProductDetailPage() {
               src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
+              width={600}
+              height={600}
             />
           </div>
 
@@ -69,7 +77,7 @@ function ProductDetailPage() {
 
             <div className="mt-4">
               <span className="text-3xl font-bold text-gray-900">
-                ₹{product.price.toFixed(2)}
+                {formatPrice(product.price)}
               </span>
             </div>
 
