@@ -15,6 +15,9 @@ export const useCreateOrder = () => {
     mutationFn: createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Invalidate all products queries to refresh the stock count
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 };

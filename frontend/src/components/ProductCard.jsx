@@ -47,11 +47,15 @@ function ProductCard({ product }) {
           </span>
           <button
             onClick={handleAddToCart}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg
-                       hover:bg-indigo-700 active:scale-95 transition-all duration-200
-                       cursor-pointer"
+            disabled={product.stock === 0}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer
+              ${
+                product.stock === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95"
+              }`}
           >
-            Add to Cart
+            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
           </button>
         </div>
 
