@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchOrders, createOrder } from "../api/axios";
 
-export const useOrders = () => {
+export const useOrders = (page = 1, limit = 10) => {
   return useQuery({
-    queryKey: ["orders"],
-    queryFn: fetchOrders,
+    queryKey: ["orders", page, limit],
+    queryFn: () => fetchOrders(page, limit),
   });
 };
 
