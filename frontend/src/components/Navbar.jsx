@@ -4,7 +4,7 @@ import useCartStore from "../store/cartStore";
 function Navbar() {
   const location = useLocation();
   const cartCount = useCartStore((state) =>
-    state.items.reduce((count, item) => count + item.quantity, 0)
+    state.items.reduce((count, item) => count + item.quantity, 0),
   );
 
   const navLinks = [
@@ -14,13 +14,13 @@ function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-gray-950 shadow-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 w-full">
           <div className="flex flex-1 items-center justify-start">
             <Link
               to="/"
-              className="text-xl font-bold text-gray-900 tracking-tight"
+              className="text-xl font-bold text-white hover:text-indigo-600 transition-colors duration-200 tracking-tight"
             >
               Whamazon
             </Link>
@@ -33,14 +33,14 @@ function Navbar() {
                 to={link.to}
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   location.pathname === link.to
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    ? "bg-indigo-600 text-white"
+                    : "text-gray-300 hover:text-white hover:bg-indigo-600"
                 }`}
               >
                 {link.label}
                 {link.to === "/cart" && cartCount > 0 && (
                   <span
-                    className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs 
+                    className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs 
                                    w-5 h-5 flex items-center justify-center rounded-full font-bold"
                   >
                     {cartCount > 9 ? "9+" : cartCount}
