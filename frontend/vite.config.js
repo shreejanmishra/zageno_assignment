@@ -12,15 +12,14 @@ export default defineConfig({
 
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom"],
-          "vendor-router": ["react-router-dom"],
-          "vendor-data": ["@tanstack/react-query", "zustand", "axios"],
+        manualChunks: (id) => {
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "vendor-react";
+          if (id.includes("node_modules/react-router-dom/")) return "vendor-router";
+          if (id.includes("node_modules/@tanstack/react-query/") || id.includes("node_modules/zustand/") || id.includes("node_modules/axios/")) return "vendor-data";
         },
       },
     },
 
     cssCodeSplit: true,
-    minify: "esbuild",
   },
 });
