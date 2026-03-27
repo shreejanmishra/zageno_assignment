@@ -1,22 +1,51 @@
 const Product = require("../models/Product");
 
+// Optional: node-cache (gracefully degrade if not installed)
+let NodeCache, myCache;
+try {
+  NodeCache = require("node-cache");
+  myCache = new NodeCache({ stdTTL: 3600 });
+} catch {
+  console.warn("[WARN] node-cache not installed. Skipping caching.");
+}
+
 // @desc    Get all products (with optional search & category filter)
 // @route   GET /api/products
 const getProducts = async (req, res) => {
   try {
-    const { search, category } = req.query;
+    const { search, category, page = 1, limit = 12 } = req.query;
     let filter = {};
 
+    // Use fast Text Search instead of slow $regex if search is provided
     if (search) {
-      filter.name = { $regex: search, $options: "i" };
+      filter.$text = { $search: search };
     }
 
     if (category) {
       filter.category = category;
     }
 
-    const products = await Product.find(filter).sort({ createdAt: -1 });
-    res.json(products);
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [products, total] = await Promise.all([
+      // Execute query with skip/limit and sort
+      Product.find(filter)
+        .sort(search ? { score: { $meta: "textScore" } } : { createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum),
+      
+      // Count total documents matching filter
+      Product.countDocuments(filter)
+    ]);
+
+    res.json({
+      products,
+      currentPage: pageNum,
+      totalPages: Math.ceil(total / limitNum),
+      totalProducts: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -42,6 +71,18 @@ const getProductById = async (req, res) => {
 // @route   GET /api/products/categories
 const getCategories = async (req, res) => {
   try {
+    if (myCache) {
+      const cacheKey = "all_categories";
+      const cachedCategories = myCache.get(cacheKey);
+      if (cachedCategories) {
+        return res.json(cachedCategories);
+      }
+
+      const categories = await Product.distinct("category");
+      myCache.set(cacheKey, categories);
+      return res.json(categories);
+    }
+
     const categories = await Product.distinct("category");
     res.json(categories);
   } catch (error) {
