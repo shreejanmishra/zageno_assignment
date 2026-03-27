@@ -1,3 +1,6 @@
+import { memo } from "react";
+import { formatPrice } from "../utils/formatPrice";
+
 function OrderCard({ order }) {
   const date = new Date(order.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -36,6 +39,9 @@ function OrderCard({ order }) {
                 <img
                   src={item.image}
                   alt={item.name}
+                  loading="lazy"
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -44,11 +50,11 @@ function OrderCard({ order }) {
                   {item.name}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Qty: {item.quantity} × ₹{item.price.toFixed(2)}
+                  Qty: {item.quantity} × {formatPrice(item.price)}
                 </p>
               </div>
               <span className="text-sm font-medium text-gray-900 flex-shrink-0">
-                ₹{(item.price * item.quantity).toFixed(2)}
+                {formatPrice(item.price * item.quantity)}
               </span>
             </div>
           ))}
@@ -58,7 +64,7 @@ function OrderCard({ order }) {
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">
           <span className="font-bold text-gray-900">Total</span>
           <span className="text-lg font-bold text-gray-900">
-            ₹{order.totalAmount.toFixed(2)}
+            {formatPrice(order.totalAmount)}
           </span>
         </div>
       </div>
@@ -66,4 +72,4 @@ function OrderCard({ order }) {
   );
 }
 
-export default OrderCard;
+export default memo(OrderCard);

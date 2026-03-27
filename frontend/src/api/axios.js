@@ -8,10 +8,12 @@ const API = axios.create({
 });
 
 // Product API
-export const fetchProducts = async ({ search = "", category = "" } = {}) => {
+export const fetchProducts = async ({ search = "", category = "", page = 1, limit = 12 } = {}) => {
   const params = new URLSearchParams();
   if (search) params.append("search", search);
   if (category) params.append("category", category);
+  params.append("page", page);
+  params.append("limit", limit);
 
   const { data } = await API.get(`/products?${params.toString()}`);
   return data;
@@ -33,8 +35,8 @@ export const createOrder = async (orderData) => {
   return data;
 };
 
-export const fetchOrders = async () => {
-  const { data } = await API.get("/orders");
+export const fetchOrders = async (page = 1, limit = 10) => {
+  const { data } = await API.get(`/orders?page=${page}&limit=${limit}`);
   return data;
 };
 

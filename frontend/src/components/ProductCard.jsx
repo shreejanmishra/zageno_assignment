@@ -1,5 +1,7 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import useCartStore from "../store/cartStore";
+import { formatPrice } from "../utils/formatPrice";
 
 function ProductCard({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -21,6 +23,9 @@ function ProductCard({ product }) {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          width={400}
+          height={400}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
       </div>
@@ -38,15 +43,19 @@ function ProductCard({ product }) {
 
         <div className="mt-4 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900">
-            ₹{product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </span>
           <button
             onClick={handleAddToCart}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg
-                       hover:bg-indigo-700 active:scale-95 transition-all duration-200
-                       cursor-pointer"
+            disabled={product.stock === 0}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer
+              ${
+                product.stock === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95"
+              }`}
           >
-            Add to Cart
+            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
           </button>
         </div>
 
@@ -63,4 +72,4 @@ function ProductCard({ product }) {
   );
 }
 
-export default ProductCard;
+export default memo(ProductCard);

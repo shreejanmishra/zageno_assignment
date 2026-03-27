@@ -1,0 +1,35 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: zageno-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: zageno-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb+srv://shrmiswork_db_user:0PPfOcq9P1pqpYoS@test.tftp5vy.mongodb.net/
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: zageno-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

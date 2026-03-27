@@ -1,4 +1,6 @@
+import { memo } from "react";
 import useCartStore from "../store/cartStore";
+import { formatPrice } from "../utils/formatPrice";
 import QuantitySelector from "./QuantitySelector";
 
 function CartItem({ item }) {
@@ -11,6 +13,9 @@ function CartItem({ item }) {
         <img
           src={item.image}
           alt={item.name}
+          loading="lazy"
+          width={96}
+          height={96}
           className="w-full h-full object-cover"
         />
       </div>
@@ -20,7 +25,7 @@ function CartItem({ item }) {
           {item.name}
         </h3>
         <p className="text-sm text-gray-500 mt-0.5">
-          ₹{item.price.toFixed(2)} each
+          {formatPrice(item.price)} each
         </p>
 
         <div className="mt-3 flex items-center justify-between gap-2">
@@ -31,7 +36,7 @@ function CartItem({ item }) {
 
           <div className="flex items-center gap-3">
             <span className="text-base font-bold text-gray-900">
-              ₹{(item.price * item.quantity).toFixed(2)}
+              {formatPrice(item.price * item.quantity)}
             </span>
             <button
               onClick={() => removeFromCart(item._id)}
@@ -44,6 +49,7 @@ function CartItem({ item }) {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -60,4 +66,4 @@ function CartItem({ item }) {
   );
 }
 
-export default CartItem;
+export default memo(CartItem);
