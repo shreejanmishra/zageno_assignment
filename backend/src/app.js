@@ -15,9 +15,6 @@ try {
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // Middleware
@@ -28,6 +25,17 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
+});
+
+// Ensure DB is connected before handling any request (critical for serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("[DB Middleware] Failed to connect:", err.message);
+    res.status(500).json({ message: "Database connection failed", error: err.message });
+  }
 });
 
 // Apply rate limiter only if available
