@@ -59,35 +59,40 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal Server Error", error: err.message });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export app for serverless platforms like Vercel
+module.exports = app;
 
-const shutdown = async (signal) => {
-  console.log(`\n${signal} signal received. Closing HTTP server...`);
-
-  server.close(async () => {
-    console.log("HTTP server closed.");
-    try {
-      await mongoose.connection.close(false);
-      console.log("MongoDB connection closed gracefully.");
-      process.exit(0);
-    } catch (err) {
-      console.error("Error closing MongoDB connection:", err);
-      process.exit(1);
-    }
+// Start server locally if not in production/serverless
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
 
-  // Force close after 10s if connections are hanging
-  setTimeout(() => {
-    console.error(
-      "Could not close connections in time, forcefully shutting down",
-    );
-    process.exit(1);
-  }, 10000);
-};
+  const shutdown = async (signal) => {
+    console.log(`\n${signal} signal received. Closing HTTP server...`);
 
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT", () => shutdown("SIGINT"));
+    server.close(async () => {
+      console.log("HTTP server closed.");
+      try {
+        await mongoose.connection.close(false);
+        console.log("MongoDB connection closed gracefully.");
+        process.exit(0);
+      } catch (err) {
+        console.error("Error closing MongoDB connection:", err);
+        process.exit(1);
+      }
+    });
+
+    // Force close after 10s if connections are hanging
+    setTimeout(() => {
+      console.error(
+        "Could not close connections in time, forcefully shutting down",
+      );
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}
